@@ -14,7 +14,7 @@ export class UserService {
   constructor(private http:HttpClient, private router:Router) { }
   userSignUp(data:SignUp){
     console.log(data)
-    return this.http.post("http://localhost:3000/users",data,{observe:'response'}).subscribe((result)=>{
+    return this.http.post("http://localhost:4000/register",data,{observe:'response'}).subscribe((result)=>{
       this.isUserLoggedIn.next(true);
       localStorage.setItem('user',JSON.stringify(result.body))
       this.router.navigate(['/profilepage']) 
@@ -30,17 +30,21 @@ export class UserService {
 
   userLogIn(data:LogIn){
     console.warn(data);
-    return this.http.get(`http://localhost:3000/users?email=${data.email}&password=${data.password}`,{observe:'response'}).subscribe((result:any)=>{
-      console.warn(result);
-      if(result && result.body && result.body.length){
+    const response = this.http.get(`http://localhost:4000/login/${data.email}/${data.password}`,{observe:'response'}).subscribe((result:any)=>{
+      console.warn(result.body);
+      if(result.body.userExist){
         console.warn("user logged In"); 
-        localStorage.setItem('user',JSON.stringify(result.body))
+        localStorage.setItem('user',JSON.stringify(result.body.userExist))
         this.router.navigate(['/profilepage']) 
       }else{ 
         alert("401 Unauthorized")
         this.isLogInError.emit(true);
       }
     }); 
+    console.warn(response);
+    return response;
   }
+
+  
 }
  
